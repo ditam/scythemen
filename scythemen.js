@@ -38,7 +38,7 @@ const sprites = {
   icon_people:  { assetURL: 'assets/icon_people.png' },
   icon_skull:   { assetURL: 'assets/icon_skull.png' },
   rocks_1:      { assetURL: 'assets/rocks_1.png', type: TILE_TYPES.ALIVE, dW: -PARAMS.TILE_WIDTH*0.1, dH: -PARAMS.TILE_WIDTH*0.1 },
-  rocks_2:      { assetURL: 'assets/rocks_2.png', type: TILE_TYPES.ALIVE, dW: -PARAMS.TILE_WIDTH*0.1 },
+  rocks_2:      { assetURL: 'assets/rocks_2.png', type: TILE_TYPES.ALIVE, dW: -PARAMS.TILE_WIDTH*0.1, dX: PARAMS.TILE_WIDTH*0.05 },
   tree_1:       { assetURL: 'assets/tree_1.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.2 },
   tree_2:       { assetURL: 'assets/tree_2.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.2 },
   tree_3:       { assetURL: 'assets/tree_3.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.2 },
@@ -46,6 +46,12 @@ const sprites = {
   trunk_1:      { assetURL: 'assets/trunk_1.png' },
   trunk_2:      { assetURL: 'assets/trunk_2.png' }
 }
+
+bgMusic = new Audio('assets/bg_music.ogg'); 
+bgMusic.addEventListener('ended', function() {
+  this.currentTime = 0;
+  this.play();
+}, false);
 
 const app = new PIXI.Application({
   antialias: true
@@ -161,6 +167,7 @@ loader.load((loader, resources) => {
   selectionMarker.lineTo(x0+tileW/2, y0+tileH);
   selectionMarker.lineTo(x0, y0+tileH/2);
   selectionMarker.lineTo(x0+tileW/2, y0);
+  selectionMarker.visible = false;
 
   app.stage.addChild(hoverMarker);
   app.stage.addChild(selectionMarker);
@@ -190,7 +197,9 @@ loader.load((loader, resources) => {
       });
     }
   }
- 
+  
+  let scythemen = {};
+
   app.ticker.add(() => {
     const hoveredTile = getTileFromCoords(mouseX, mouseY);
     if (hoveredTile) {
@@ -201,9 +210,16 @@ loader.load((loader, resources) => {
     }
   });
   
+  let selectedTile = {
+    row: undefined,
+    col: undefined
+  };
+  
   document.addEventListener('click', function(e) {
     const clickedTile = getTileFromCoords(e.clientX, e.clientY);
     if (clickedTile) {
+      selectedTile.row = clickedTile.row;
+      selectedTile.col = clickedTile.col;
       const tileX = - clickedTile.row*tileW/2 + clickedTile.col*tileW/2;
       const tileY = clickedTile.row*tileH/2 + clickedTile.col*tileH/2;
       selectionMarker.x = tileX;
@@ -211,6 +227,25 @@ loader.load((loader, resources) => {
       selectionMarker.visible = true;
     } else {
       selectionMarker.visible = false;
+    }
+  });
+  
+  document.addEventListener('keypress', function(e) {
+    if (e.key === 's' && selectionMarker.visible) {
+      const id = selectedTile.row + '|' + selectedTile.col;
+      if (id in scythemen) {
+        app.stage.removeChild(scythemen[id]);
+        delete scythemen[id];
+      } else {
+        bgMusic.play();
+        const marker = new PIXI.Sprite(resources.death.texture);
+        marker.width = tileW / 2;
+        marker.height = marker.width / 555 * 640; // maintain aspect ratio of image
+        marker.x = PARAMS.OFFSET_X - selectedTile.row*tileW/2 + selectedTile.col*tileW/2 + tileW * 0.22;
+        marker.y = PARAMS.OFFSET_Y + selectedTile.row*tileH/2 + selectedTile.col*tileH/2 + tileH * 0.1;
+        app.stage.addChild(marker);
+        scythemen[id] = marker;
+      }
     }
   });
 });
