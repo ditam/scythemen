@@ -13,7 +13,7 @@ const PARAMS = Object.freeze({
 
 // NB: size adjustment values are additive, derive from TILE_WIDTH
 const objectData = {
-  bush:         { assetURL: 'assets/bush.png', isAlive: true, class: 'misc', dW: -PARAMS.TILE_WIDTH*0.1 },
+  bush:         { assetURL: 'assets/bush.png', humanCount: 2, isAlive: true, class: 'misc', dW: -PARAMS.TILE_WIDTH*0.1 },
   coffin:       { assetURL: 'assets/coffin.png', class: 'misc', dW: -PARAMS.TILE_WIDTH*0.15 },
   crypt:        { assetURL: 'assets/crypt.png', class: 'misc' },
   death:        { assetURL: 'assets/death.png' },
@@ -26,20 +26,20 @@ const objectData = {
   gravestone_4: { assetURL: 'assets/gravestone_4.png', class: 'human', dW: -PARAMS.TILE_WIDTH*0.15, dH: PARAMS.TILE_WIDTH*0.15 },
   ground:       { assetURL: 'assets/ground.png' },
   ground_dead:  { assetURL: 'assets/ground_dead.png' },
-  house_1:      { assetURL: 'assets/house_1.png', isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.15 },
-  house_2:      { assetURL: 'assets/house_2.png', isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.15 },
-  house_3:      { assetURL: 'assets/house_3.png', isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.15 },
-  house_4:      { assetURL: 'assets/house_4.png', isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.45 },
-  house_5:      { assetURL: 'assets/house_5.png', isAlive: true, class: 'human', dW: -PARAMS.TILE_WIDTH*0.15, dX: PARAMS.TILE_WIDTH*0.1 },
+  house_1:      { assetURL: 'assets/house_1.png', humanCount: 20, isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.15 },
+  house_2:      { assetURL: 'assets/house_2.png', humanCount: 30, isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.15 },
+  house_3:      { assetURL: 'assets/house_3.png', humanCount: 40, isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.15 },
+  house_4:      { assetURL: 'assets/house_4.png', humanCount: 120, isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.45 },
+  house_5:      { assetURL: 'assets/house_5.png', humanCount: 10, isAlive: true, class: 'human', dW: -PARAMS.TILE_WIDTH*0.15, dX: PARAMS.TILE_WIDTH*0.1 },
   icon_check:   { assetURL: 'assets/icon_check.png' },
   icon_people:  { assetURL: 'assets/icon_people.png' },
   icon_skull:   { assetURL: 'assets/icon_skull.png' },
   rocks_1:      { assetURL: 'assets/rocks_1.png', isAlive: true, class: 'misc', dW: -PARAMS.TILE_WIDTH*0.1, dH: -PARAMS.TILE_WIDTH*0.1 },
   rocks_2:      { assetURL: 'assets/rocks_2.png', isAlive: true, class: 'misc', dW: -PARAMS.TILE_WIDTH*0.1, dX: PARAMS.TILE_WIDTH*0.05 },
-  tree_1:       { assetURL: 'assets/tree_1.png', isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
-  tree_2:       { assetURL: 'assets/tree_2.png', isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
-  tree_3:       { assetURL: 'assets/tree_3.png', isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
-  tree_4:       { assetURL: 'assets/tree_4.png', isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
+  tree_1:       { assetURL: 'assets/tree_1.png', humanCount: 2, isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
+  tree_2:       { assetURL: 'assets/tree_2.png', humanCount: 2, isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
+  tree_3:       { assetURL: 'assets/tree_3.png', humanCount: 2, isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
+  tree_4:       { assetURL: 'assets/tree_4.png', humanCount: 5, isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
   trunk_1:      { assetURL: 'assets/trunk_1.png', class: 'tree', dW: -PARAMS.TILE_WIDTH*0.15, dX: PARAMS.TILE_WIDTH*0.05 },
   trunk_2:      { assetURL: 'assets/trunk_2.png', class: 'tree', dW: -PARAMS.TILE_WIDTH*0.1, dH: PARAMS.TILE_WIDTH*0.15 }
 }
@@ -49,7 +49,6 @@ const app = new PIXI.Application({
   width: 1000,
   height: 600
 });
-console.log('app:',app);
 document.body.appendChild(app.view);
 app.stage.buttonMode = true;
 app.stage.interactive = true;
@@ -82,7 +81,6 @@ const objects = {};
     map[i] = mapRow;
     objects[i] = objectsRow;
   }
-  console.log('maps initialized:', map, objects);
 })();
 
 (function drawGrid() {
@@ -162,10 +160,10 @@ function displayObjectsForTile(i, j, resources) {
     objSprite.width = objW + (currentObj.dW | 0);
     objSprite.height = objH + (currentObj.dH | 0);
     const positions = {
-      0: { x: objW,        y: objW*0.2 },
-      1: { x: objW*0.3,    y: objW*0.65 },
-      2: { x: objW*1.7,    y: objW*0.65 },
-      3: { x: objW,        y: objW*1.1 }
+      0: { x: objW,      y: objW*0.2 },
+      1: { x: objW*0.3,  y: objW*0.65 },
+      2: { x: objW*1.7,  y: objW*0.65 },
+      3: { x: objW,      y: objW*1.1 }
     }
     objSprite.x = tileBaseX + positions[index].x + (currentObj.dX | 0);
     objSprite.y = tileBaseY + positions[index].y + (currentObj.dY | 0) - (currentObj.dH | 0);
@@ -192,6 +190,45 @@ function rebuildScene(resources) {
   }
 }
 
+let scythemen = {};
+let scythemenLimit = 1;
+let scythemanCost = 25;
+let roundCount = 0;
+let deadCount = 0;
+let livingCount = 0;
+
+for (let i=0; i<PARAMS.MAP_ROWS; i++) {
+  for (let j=0; j<PARAMS.MAP_COLS; j++) {
+    objects[i][j].forEach(function(objectName) {
+      const oData = objectData[objectName];
+      livingCount += oData.humanCount | 0;
+    });
+  }
+}
+  
+function updateCounters() {
+  document.getElementById('people-counter').innerHTML = livingCount;
+  document.getElementById('dead-counter').innerHTML = deadCount;
+  document.getElementById('scythemen-counter').innerHTML = scythemenLimit - Object.keys(scythemen).length;
+  document.getElementById('round-counter').innerHTML = roundCount;
+  document.getElementById('cost-counter').innerHTML = scythemanCost;
+}
+updateCounters();
+
+document.getElementById('buy-button').addEventListener('click', function(e) {
+  const cost = scythemanCost;
+  if (deadCount <= cost) {
+    alert('You don\'t have enough dead souls to buy a new scytheman. Reap more.');
+  } else {
+    deadCount = deadCount - cost;
+    scythemanCost = cost + 50;
+    scythemenLimit++;
+  }
+  updateCounters();
+});
+
+
+  
 loader.load((loader, resources) => {
   document.addEventListener('mousemove', function(e) {
     mouseX = e.clientX;
@@ -205,8 +242,6 @@ loader.load((loader, resources) => {
   }, false);
 
   rebuildScene(resources);
-  
-  let scythemen = {};
 
   app.ticker.add(() => {
     const hoveredTile = getTileFromCoords(mouseX, mouseY);
@@ -244,7 +279,7 @@ loader.load((loader, resources) => {
       if (id in scythemen) {
         app.stage.removeChild(scythemen[id]);
         delete scythemen[id];
-      } else {
+      } else if (Object.keys(scythemen).length < scythemenLimit) {
         bgMusic.play();
         const marker = new PIXI.Sprite(resources.death.texture);
         marker.width = tileW / 2;
@@ -254,8 +289,10 @@ loader.load((loader, resources) => {
         app.stage.addChild(marker);
         scythemen[id] = marker;
       }
-    } else if (e.key === 'n' && selectionMarker.visible) {
+      updateCounters();
+    } else if (e.key === 'r' && selectionMarker.visible) {
       killMarkedTiles();
+      updateCounters();
     }
   });
   
@@ -276,14 +313,28 @@ loader.load((loader, resources) => {
       const objectList = objects[row][col];
       const deadObjectList = objectList.map(objectKey => {
         const objParams = objectData[objectKey];
+        deadCount += objParams.humanCount | 0;
+        livingCount -= objParams.humanCount | 0;
         const deadItemsInClass = Object.keys(objectData).filter(key => objectData[key].isAlive!==true && objectData[key].class===objParams.class);
         return getRandomItem(deadItemsInClass);
       });
       objects[row][col] = deadObjectList;
     });
+    roundCount++;
+    updateCounters();
     rebuildScene(resources);
+    checkVictory();
   }
 });
+
+function checkVictory() {
+  for (let i=0; i<PARAMS.MAP_ROWS; i++) {
+    for (let j=0; j<PARAMS.MAP_COLS; j++) {
+      if (map[i][j] !== 'ground_dead') return;
+    }
+  }
+  alert('Congratulations! You\'ve reaped all living souls in '+roundCount+' rounds.');
+}
 
 function getTileFromCoords(clientX, clientY) {
   // We calculate the hit tile directly from the coordinates, returning undefined if no tile is hit.
