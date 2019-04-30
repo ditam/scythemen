@@ -217,7 +217,7 @@ updateCounters();
 
 document.getElementById('buy-button').addEventListener('click', function(e) {
   const cost = scythemanCost;
-  if (deadCount <= cost) {
+  if (deadCount < cost) {
     alert('You don\'t have enough dead souls to buy a new scytheman. Reap more.');
   } else {
     deadCount = deadCount - cost;
