@@ -2,7 +2,7 @@
 const PARAMS = Object.freeze({
   MAP_ROWS: 6,
   MAP_COLS: 5,
-  OFFSET_X: 350,
+  OFFSET_X: 550,
   OFFSET_Y: 30,
   TILE_WIDTH: 140,
   ASPECT: 150/108,
@@ -11,50 +11,43 @@ const PARAMS = Object.freeze({
   SELECT_COLOR: 0xdd3333
 });
 
-const TILE_TYPES = {
-  ALIVE: 'ALIVE',
-  DEAD: 'DEAD'
-};
-
 // NB: size adjustment values are additive, derive from TILE_WIDTH
-const sprites = {
-  bush:         { assetURL: 'assets/bush.png', type: TILE_TYPES.ALIVE, dW: -PARAMS.TILE_WIDTH*0.1 },
-  coffin:       { assetURL: 'assets/coffin.png', type: TILE_TYPES.DEAD },
-  crypt:        { assetURL: 'assets/crypt.png', type: TILE_TYPES.DEAD },
+const objectData = {
+  bush:         { assetURL: 'assets/bush.png', isAlive: true, class: 'misc', dW: -PARAMS.TILE_WIDTH*0.1 },
+  coffin:       { assetURL: 'assets/coffin.png', class: 'misc', dW: -PARAMS.TILE_WIDTH*0.15 },
+  crypt:        { assetURL: 'assets/crypt.png', class: 'misc' },
   death:        { assetURL: 'assets/death.png' },
-  debris:       { assetURL: 'assets/debris.png', type: TILE_TYPES.DEAD },
-  empty:        { assetURL: 'assets/empty.png', type: TILE_TYPES.ALIVE },
-  gravestone_1: { assetURL: 'assets/gravestone_1.png', type: TILE_TYPES.DEAD },
-  gravestone_2: { assetURL: 'assets/gravestone_2.png', type: TILE_TYPES.DEAD },
-  gravestone_3: { assetURL: 'assets/gravestone_3.png', type: TILE_TYPES.DEAD },
-  gravestone_4: { assetURL: 'assets/gravestone_4.png', type: TILE_TYPES.DEAD },
+  debris:       { assetURL: 'assets/debris.png', class: 'misc' },
+  empty:        { assetURL: 'assets/empty.png', isAlive: true, class: 'empty' },
+  empty_dead:   { assetURL: 'assets/empty.png', class: 'empty' },
+  gravestone_1: { assetURL: 'assets/gravestone_1.png', class: 'human', dW: -PARAMS.TILE_WIDTH*0.15, dH: PARAMS.TILE_WIDTH*0.1 },
+  gravestone_2: { assetURL: 'assets/gravestone_2.png', class: 'human', dH: PARAMS.TILE_WIDTH*0.15 },
+  gravestone_3: { assetURL: 'assets/gravestone_3.png', class: 'human' },
+  gravestone_4: { assetURL: 'assets/gravestone_4.png', class: 'human', dW: -PARAMS.TILE_WIDTH*0.15, dH: PARAMS.TILE_WIDTH*0.15 },
   ground:       { assetURL: 'assets/ground.png' },
-  house_1:      { assetURL: 'assets/house_1.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.15 },
-  house_2:      { assetURL: 'assets/house_2.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.15 },
-  house_3:      { assetURL: 'assets/house_3.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.15 },
-  house_4:      { assetURL: 'assets/house_4.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.45 },
-  house_5:      { assetURL: 'assets/house_5.png', type: TILE_TYPES.ALIVE, dW: -PARAMS.TILE_WIDTH*0.15, dX: PARAMS.TILE_WIDTH*0.1 },
+  ground_dead:  { assetURL: 'assets/ground_dead.png' },
+  house_1:      { assetURL: 'assets/house_1.png', isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.15 },
+  house_2:      { assetURL: 'assets/house_2.png', isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.15 },
+  house_3:      { assetURL: 'assets/house_3.png', isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.15 },
+  house_4:      { assetURL: 'assets/house_4.png', isAlive: true, class: 'human', dH: PARAMS.TILE_WIDTH*0.45 },
+  house_5:      { assetURL: 'assets/house_5.png', isAlive: true, class: 'human', dW: -PARAMS.TILE_WIDTH*0.15, dX: PARAMS.TILE_WIDTH*0.1 },
   icon_check:   { assetURL: 'assets/icon_check.png' },
   icon_people:  { assetURL: 'assets/icon_people.png' },
   icon_skull:   { assetURL: 'assets/icon_skull.png' },
-  rocks_1:      { assetURL: 'assets/rocks_1.png', type: TILE_TYPES.ALIVE, dW: -PARAMS.TILE_WIDTH*0.1, dH: -PARAMS.TILE_WIDTH*0.1 },
-  rocks_2:      { assetURL: 'assets/rocks_2.png', type: TILE_TYPES.ALIVE, dW: -PARAMS.TILE_WIDTH*0.1, dX: PARAMS.TILE_WIDTH*0.05 },
-  tree_1:       { assetURL: 'assets/tree_1.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.2 },
-  tree_2:       { assetURL: 'assets/tree_2.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.2 },
-  tree_3:       { assetURL: 'assets/tree_3.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.2 },
-  tree_4:       { assetURL: 'assets/tree_4.png', type: TILE_TYPES.ALIVE, dH: PARAMS.TILE_WIDTH*0.2 },
-  trunk_1:      { assetURL: 'assets/trunk_1.png' },
-  trunk_2:      { assetURL: 'assets/trunk_2.png' }
+  rocks_1:      { assetURL: 'assets/rocks_1.png', isAlive: true, class: 'misc', dW: -PARAMS.TILE_WIDTH*0.1, dH: -PARAMS.TILE_WIDTH*0.1 },
+  rocks_2:      { assetURL: 'assets/rocks_2.png', isAlive: true, class: 'misc', dW: -PARAMS.TILE_WIDTH*0.1, dX: PARAMS.TILE_WIDTH*0.05 },
+  tree_1:       { assetURL: 'assets/tree_1.png', isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
+  tree_2:       { assetURL: 'assets/tree_2.png', isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
+  tree_3:       { assetURL: 'assets/tree_3.png', isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
+  tree_4:       { assetURL: 'assets/tree_4.png', isAlive: true, class: 'tree', dH: PARAMS.TILE_WIDTH*0.2 },
+  trunk_1:      { assetURL: 'assets/trunk_1.png', class: 'tree', dW: -PARAMS.TILE_WIDTH*0.15, dX: PARAMS.TILE_WIDTH*0.05 },
+  trunk_2:      { assetURL: 'assets/trunk_2.png', class: 'tree', dW: -PARAMS.TILE_WIDTH*0.1, dH: PARAMS.TILE_WIDTH*0.15 }
 }
 
-bgMusic = new Audio('assets/bg_music.ogg'); 
-bgMusic.addEventListener('ended', function() {
-  this.currentTime = 0;
-  this.play();
-}, false);
-
 const app = new PIXI.Application({
-  antialias: true
+  antialias: true,
+  width: 1000,
+  height: 600
 });
 console.log('app:',app);
 document.body.appendChild(app.view);
@@ -65,20 +58,19 @@ app.stage.cursor = 'url(assets/cursor.png) 5 5, auto';﻿
 const gridlines = new PIXI.Graphics();
 const loader = PIXI.loader;
 
-for (let key in sprites) {
-  const sprite = sprites[key];
+for (let key in objectData) {
+  const sprite = objectData[key];
   loader.add(key, sprite.assetURL);
 }
 
 const map = {};
 const objects = {};
 (function initMap() {
-  const aliveObjectNames = Object.keys(sprites).filter(key => sprites[key].type === TILE_TYPES.ALIVE);
+  const aliveObjectNames = Object.keys(objectData).filter(key => !!objectData[key].isAlive);
   for (let i=0; i<PARAMS.MAP_ROWS; i++) {
     const mapRow = {};
     const objectsRow = {};
     for (let j=0; j<PARAMS.MAP_COLS; j++) {
-      //row[j] = ['ground', 'ground_2', 'ground_3'][(i+j)%3];
       mapRow[j] = 'ground';
       objectsRow[j] = [
         getRandomItem(aliveObjectNames),
@@ -124,79 +116,95 @@ const objects = {};
 let mouseX = 0;
 let mouseY = 0;
 
+const tileW = PARAMS.TILE_WIDTH;
+const tileH = tileW/PARAMS.ASPECT;
+
+const x0 = PARAMS.OFFSET_X;
+const y0 = PARAMS.OFFSET_Y;  
+
+const hoverMarker = new PIXI.Graphics();
+hoverMarker.moveTo(x0+tileW/2, y0);
+hoverMarker.lineStyle(4, PARAMS.HOVER_COLOR);  
+hoverMarker.lineTo(x0+tileW, y0+tileH/2);
+hoverMarker.lineTo(x0+tileW/2, y0+tileH);
+hoverMarker.lineTo(x0, y0+tileH/2);
+hoverMarker.lineTo(x0+tileW/2, y0);
+
+const selectionMarker = new PIXI.Graphics();
+selectionMarker.moveTo(x0+tileW/2, y0);
+selectionMarker.lineStyle(4, PARAMS.SELECT_COLOR);  
+selectionMarker.lineTo(x0+tileW, y0+tileH/2);
+selectionMarker.lineTo(x0+tileW/2, y0+tileH);
+selectionMarker.lineTo(x0, y0+tileH/2);
+selectionMarker.lineTo(x0+tileW/2, y0);
+selectionMarker.visible = false;
+
+function displayGroundForTile(i, j, resources) {
+  const currentTileKey = map[i][j];
+  const currentTile = objectData[currentTileKey];
+  const ground = new PIXI.Sprite(resources[currentTileKey].texture);
+  ground.width = tileW + (currentTile.dW | 0);
+  ground.height = tileH + (currentTile.dH | 0);
+  ground.x = PARAMS.OFFSET_X - i*tileW/2 + j*tileW/2 + (currentTile.dX | 0);
+  ground.y = PARAMS.OFFSET_Y + i*tileH/2 + j*tileH/2 + (currentTile.dY | 0);      
+  app.stage.addChild(ground);
+}
+
+function displayObjectsForTile(i, j, resources) {
+  const tileBaseX = PARAMS.OFFSET_X - i*tileW/2 + j*tileW/2;
+  const tileBaseY = PARAMS.OFFSET_Y + i*tileH/2 + j*tileH/2; 
+  const currentTileObjects = objects[i][j];
+  currentTileObjects.forEach(function(objKey, index) {
+    const currentObj = objectData[objKey];
+    const objW = tileW / 3;
+    const objH = objW/PARAMS.ASPECT;
+    const objSprite = new PIXI.Sprite(resources[objKey].texture);
+    objSprite.width = objW + (currentObj.dW | 0);
+    objSprite.height = objH + (currentObj.dH | 0);
+    const positions = {
+      0: { x: objW,        y: objW*0.2 },
+      1: { x: objW*0.3,    y: objW*0.65 },
+      2: { x: objW*1.7,    y: objW*0.65 },
+      3: { x: objW,        y: objW*1.1 }
+    }
+    objSprite.x = tileBaseX + positions[index].x + (currentObj.dX | 0);
+    objSprite.y = tileBaseY + positions[index].y + (currentObj.dY | 0) - (currentObj.dH | 0);
+    app.stage.addChild(objSprite);
+  });
+}
+
+function rebuildScene(resources) {
+  app.stage.removeChildren();
+  
+  for (let i=0; i<PARAMS.MAP_ROWS; i++) {
+    for (let j=0; j<PARAMS.MAP_COLS; j++) {
+      displayGroundForTile(i, j, resources);
+    }
+  }
+  app.stage.addChild(gridlines);
+  app.stage.addChild(hoverMarker);
+  app.stage.addChild(selectionMarker);
+
+  for (let i=0; i<PARAMS.MAP_ROWS; i++) {
+    for (let j=0; j<PARAMS.MAP_COLS; j++) {
+      displayObjectsForTile(i, j, resources);
+    }
+  }
+}
+
 loader.load((loader, resources) => {
   document.addEventListener('mousemove', function(e) {
     mouseX = e.clientX;
     mouseY = e.clientY;
   });
 
-  const tileW = PARAMS.TILE_WIDTH;
-  const tileH = tileW/PARAMS.ASPECT;
+  bgMusic = new Audio('assets/bg_music.ogg'); 
+  bgMusic.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+  }, false);
 
-  // draw tile map
-  for (let i=0; i<PARAMS.MAP_ROWS; i++) {
-    for (let j=0; j<PARAMS.MAP_COLS; j++) {
-      const currentTileKey = map[i][j];
-      const currentTile = sprites[currentTileKey];
-      const ground = new PIXI.Sprite(resources[currentTileKey].texture);
-      ground.width = tileW + (currentTile.dW | 0);
-      ground.height = tileH + (currentTile.dH | 0);
-      ground.x = PARAMS.OFFSET_X - i*tileW/2 + j*tileW/2 + (currentTile.dX | 0);
-      ground.y = PARAMS.OFFSET_Y + i*tileH/2 + j*tileH/2 + (currentTile.dY | 0);      
-      app.stage.addChild(ground);
-    }
-  }
-  
-  app.stage.addChild(gridlines);
-
-  const x0 = PARAMS.OFFSET_X;
-  const y0 = PARAMS.OFFSET_Y;
-  
-  const hoverMarker = new PIXI.Graphics();
-  hoverMarker.moveTo(x0+tileW/2, y0);
-  hoverMarker.lineStyle(4, PARAMS.HOVER_COLOR);  
-  hoverMarker.lineTo(x0+tileW, y0+tileH/2);
-  hoverMarker.lineTo(x0+tileW/2, y0+tileH);
-  hoverMarker.lineTo(x0, y0+tileH/2);
-  hoverMarker.lineTo(x0+tileW/2, y0);
-  
-  const selectionMarker = new PIXI.Graphics();
-  selectionMarker.moveTo(x0+tileW/2, y0);
-  selectionMarker.lineStyle(4, PARAMS.SELECT_COLOR);  
-  selectionMarker.lineTo(x0+tileW, y0+tileH/2);
-  selectionMarker.lineTo(x0+tileW/2, y0+tileH);
-  selectionMarker.lineTo(x0, y0+tileH/2);
-  selectionMarker.lineTo(x0+tileW/2, y0);
-  selectionMarker.visible = false;
-
-  app.stage.addChild(hoverMarker);
-  app.stage.addChild(selectionMarker);
-
-  // draw objects on map
-  for (let i=0; i<PARAMS.MAP_ROWS; i++) {
-    for (let j=0; j<PARAMS.MAP_COLS; j++) {
-      const tileBaseX = PARAMS.OFFSET_X - i*tileW/2 + j*tileW/2;
-      const tileBaseY = PARAMS.OFFSET_Y + i*tileH/2 + j*tileH/2; 
-      const currentTileObjects = objects[i][j];
-      currentTileObjects.forEach(function(objKey, index) {
-        const currentObj = sprites[objKey];
-        const objW = tileW / 3;
-        const objH = objW/PARAMS.ASPECT;
-        const objSprite = new PIXI.Sprite(resources[objKey].texture);
-        objSprite.width = objW + (currentObj.dW | 0);
-        objSprite.height = objH + (currentObj.dH | 0);
-        const positions = {
-          0: { x: objW,        y: objW*0.2 },
-          1: { x: objW*0.3,    y: objW*0.65 },
-          2: { x: objW*1.7,    y: objW*0.65 },
-          3: { x: objW,        y: objW*1.1 }
-        }
-        objSprite.x = tileBaseX + positions[index].x + (currentObj.dX | 0);
-        objSprite.y = tileBaseY + positions[index].y + (currentObj.dY | 0) - (currentObj.dH | 0);
-        app.stage.addChild(objSprite);
-      });
-    }
-  }
+  rebuildScene(resources);
   
   let scythemen = {};
 
@@ -246,8 +254,35 @@ loader.load((loader, resources) => {
         app.stage.addChild(marker);
         scythemen[id] = marker;
       }
+    } else if (e.key === 'n' && selectionMarker.visible) {
+      killMarkedTiles();
     }
   });
+  
+  function killMarkedTiles() {
+    Object.keys(scythemen).forEach(function(id){
+      const marker = scythemen[id];
+      let row, col;
+      [row, col] = id.split('|');
+      
+      // replace ground
+      map[row][col] = 'ground_dead';
+      
+      // remove scytheman marker
+      app.stage.removeChild(scythemen[id]); // currently this is redundant as we are rebuilding the scene anyway
+      delete scythemen[id];
+
+      // replace objects on tile
+      const objectList = objects[row][col];
+      const deadObjectList = objectList.map(objectKey => {
+        const objParams = objectData[objectKey];
+        const deadItemsInClass = Object.keys(objectData).filter(key => objectData[key].isAlive!==true && objectData[key].class===objParams.class);
+        return getRandomItem(deadItemsInClass);
+      });
+      objects[row][col] = deadObjectList;
+    });
+    rebuildScene(resources);
+  }
 });
 
 function getTileFromCoords(clientX, clientY) {
